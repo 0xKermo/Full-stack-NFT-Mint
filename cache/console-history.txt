@@ -1,0 +1,7 @@
+import NFT from '../artifacts/contracts/Nft.sol/Test.json'
+NFTabi.contracts
+var NFTabi = config.paths.artifacts
+config
+!ls
+ls
+dir

@@ -4,7 +4,13 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 
 Try running some of the following tasks:
 
+
+
 ```shell
+git clone https://github.com/behzatce/NFT-mint.git
+cd NFT-mint
+npm init
+npm install
 npx hardhat accounts
 npx hardhat compile
 npx hardhat clean

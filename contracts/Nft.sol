@@ -12,67 +12,74 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 
-contract Test is ERC721, Ownable {
+contract mintPass is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     
-    bytes32 public root;
-    
+    bytes32 public root; // // who can mint on presale ? 
 
-    string BASE_URI = "your uri";
+    string BASE_URI = "your uri"; // What will my mintPass look like?
     
-    bool public IS_PRESALE_ACTIVE = false;
-    bool public IS_SALE_ACTIVE = false;
+    bool public IS_PRESALE_ACTIVE = false; // is Presale started?
+    bool public IS_SALE_ACTIVE = false;  // is Publicsale started?
     
-    uint public constant TOTAL_SUPPLY = 9999;
-    uint public constant MINT_PRICE = 0.01 ether; 
+    uint public constant TOTAL_SUPPLY = 9999; // MAX_SUPPLY - My mintPass = number of siblings of my mintPass
+    uint public constant MINT_PRICE = 0.01 ether; // how much will i pay? 
 
-    uint constant NUMBER_OF_TOKENS_ALLOWED_PER_ADDRESS = 2;
+    uint constant NUMBER_OF_TOKENS_ALLOWED_PER_ADDRESS = 2; // how many can i get?
     
-    mapping (address => uint) addressToMintCount;
+    mapping (address => uint) addressToMintCount; // How many nft did I mint?
 
+     /*
+    @Person: Will bots be able to mint?
 
+    @return: No. 
+    */
+    modifier onlyAccounts () {
+        require(msg.sender == tx.origin, "Not allowed origin");
+        _;
+    }
+    
     constructor(string memory name, string memory symbol, bytes32 merkleroot)
     ERC721(name, symbol)
     {
         root = merkleroot;
         _tokenIdCounter.increment();
     }
-
+    
     function setMerkleRoot(bytes32 merkleroot) 
     onlyOwner 
     public 
     {
         root = merkleroot;
     }
-
+    
+    // get metadata
     function _baseURI() internal view override returns (string memory) {
         return BASE_URI;
     }
-    
+    // set metadata
     function setBaseURI(string memory newUri) 
     public 
     onlyOwner {
         BASE_URI = newUri;
     }
 
+    // Publicsale activate or deactivate
     function togglePublicSale() public 
     onlyOwner 
     {
         IS_SALE_ACTIVE = !IS_SALE_ACTIVE;
     }
-
+    
+    // Presale activate or deactivate
     function togglePreSale() public 
     onlyOwner 
     {
         IS_PRESALE_ACTIVE = !IS_PRESALE_ACTIVE;
     }
-
-    modifier onlyAccounts () {
-        require(msg.sender == tx.origin, "Not allowed origin");
-        _;
-    }
-
+    
+    // contract ownermint
     function ownerMint(uint numberOfTokens) 
     public 
     onlyOwner {
@@ -80,7 +87,7 @@ contract Test is ERC721, Ownable {
         require(current + numberOfTokens < TOTAL_SUPPLY, "Exceeds total supply");
 
         for (uint i = 0; i < numberOfTokens; i++) {
-            mintInternal();
+            mintNFT();
         }
     }
 
@@ -104,7 +111,7 @@ contract Test is ERC721, Ownable {
         addressToMintCount[msg.sender] += numberOfTokens;
 
         for (uint i = 0; i < numberOfTokens; i++) {
-            mintInternal();
+            mintNFT();
         }
     }
 
@@ -124,7 +131,7 @@ contract Test is ERC721, Ownable {
         addressToMintCount[msg.sender] += numberOfTokens;
 
         for (uint i = 0; i < numberOfTokens; i++) {
-            mintInternal();
+            mintNFT();
         }
     }
 
@@ -132,7 +139,7 @@ contract Test is ERC721, Ownable {
         return addressToMintCount[_account];
     }
 
-    function mintInternal() internal {
+    function mintNFT() internal {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _mint(msg.sender, tokenId);
